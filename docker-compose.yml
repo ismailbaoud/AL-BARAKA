@@ -1,0 +1,40 @@
+version: "3.9"
+services:
+  app:
+    networks:
+      - net-albaraka_app
+    build:
+      context: .
+    container_name: albaraka_app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/albaraka_test
+      SPRING_DATASOURCE_USERNAME: happy
+      SPRING_DATASOURCE_PASSWORD: happy
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      FILE_UPLOAD_DIR: ./upload
+    depends_on:
+      - db
+
+  db:
+    networks:
+      - net-albaraka_app
+    image: postgres:15-alpine
+    container_name: albaraka_db
+    environment:
+      POSTGRES_DB: albaraka_test
+      POSTGRES_USER: happy
+      POSTGRES_PASSWORD: happy
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+networks:
+  net-albaraka_app:
