@@ -15,23 +15,23 @@ import com.ismail.al_baraka.service.impliment.OperationServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/agent/operations")
+@RequestMapping("/api/")
 @RequiredArgsConstructor
 public class AgentController {
     
     private final OperationServiceImpl operationService;
 
-    @GetMapping("/pending")
+    @GetMapping("/agentauth/pending")
     public ResponseEntity<List<OperationResponse>> getPandingOperationsList() {
         return ResponseEntity.ok().body(operationService.getPandingOperationsList());
     }
 
-    @PutMapping("/{id}/approve")
+    @PutMapping("agent/operations/{id}/approve")
     public ResponseEntity<OperationResponse> approveOperations(@PathVariable("id") Long opId) {
         return ResponseEntity.ok().body(operationService.approveOperation(opId));
     }
 
-    @PutMapping("/{id}/reject")
+    @PutMapping("agent/operations/{id}/reject")
     public ResponseEntity<OperationResponse> rejectOperation(@PathVariable("id") Long opId) {
         return ResponseEntity.ok().body(operationService.rejectOperation(opId));
     }
