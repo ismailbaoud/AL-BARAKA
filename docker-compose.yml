@@ -1,40 +1,61 @@
-version: "3.9"
 services:
-  app:
-    networks:
-      - net-albaraka_app
-    build:
-      context: .
-    container_name: albaraka_app
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/albaraka_test
-      SPRING_DATASOURCE_USERNAME: happy
-      SPRING_DATASOURCE_PASSWORD: happy
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "true"
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-      FILE_UPLOAD_DIR: ./upload
-    depends_on:
-      - db
 
   db:
-    networks:
-      - net-albaraka_app
     image: postgres:15-alpine
     container_name: albaraka_db
+    networks:
+      - net-albaraka_app
     environment:
       POSTGRES_DB: albaraka_test
       POSTGRES_USER: happy
       POSTGRES_PASSWORD: happy
     ports:
-      - "5432:5432"
+      - "5431:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: albaraka-keycloak
+    command: start-dev --import-realm
+    networks:
+      - net-albaraka_app
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak-imports:/opt/keycloak/data/import
+
+  app:
+    build:
+      context: .
+    container_name: albaraka_app
+    networks:
+      - net-albaraka_app
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/albaraka_test
+      SPRING_DATASOURCE_USERNAME: happy
+      SPRING_DATASOURCE_PASSWORD: happy
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/albaraka
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/albaraka
+
+    depends_on:
+      - db
+      - keycloak
 
 volumes:
-  postgres_data:
+  pgdata:
+  keycloak_data:
 
 networks:
   net-albaraka_app:
+    driver: bridge
