@@ -1,0 +1,17 @@
+name: albaraka-workflow
+on: 
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: set up jdk 21
+        uses: actions/setup-java@3
+        with:
+          java-version: 21
+      - name: Build and test
+        run: mvn clean install
