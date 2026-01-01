@@ -4,6 +4,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -57,6 +58,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handelGeneral(Exception ex, HttpServletRequest request) {
         ex.printStackTrace();
         return buildError("Internal server error", request, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiErrorResponse> handleHttpMethodNotSeported(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        ex.printStackTrace();
+        return buildError("the method '"+ ex.getMethod() + "'' not validate in this endpoint", request, HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<ApiErrorResponse> buildError(String message , HttpServletRequest req, HttpStatus status) {

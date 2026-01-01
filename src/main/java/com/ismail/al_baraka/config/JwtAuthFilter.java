@@ -56,7 +56,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         return path.startsWith("/oauth2/")
             || path.startsWith("/login/oauth2/")
-            || path.startsWith("/api/agentauth/pending")
+            || path.startsWith("/api/agentauth/operations/pending")
             || path.startsWith("/error");
     }
 }
