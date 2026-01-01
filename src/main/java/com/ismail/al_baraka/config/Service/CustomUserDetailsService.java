@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ismail.al_baraka.model.User;
-import com.ismail.al_baraka.model.enums.AuthProvider;
 import com.ismail.al_baraka.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

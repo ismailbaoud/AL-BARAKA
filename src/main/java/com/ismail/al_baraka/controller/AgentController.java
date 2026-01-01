@@ -21,7 +21,7 @@ public class AgentController {
     
     private final OperationServiceImpl operationService;
 
-    @GetMapping("/agentauth/pending")
+    @GetMapping("/agentauth/operations/pending")
     public ResponseEntity<List<OperationResponse>> getPandingOperationsList() {
         return ResponseEntity.ok().body(operationService.getPandingOperationsList());
     }

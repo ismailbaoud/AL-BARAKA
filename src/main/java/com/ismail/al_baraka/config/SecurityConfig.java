@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import com.ismail.al_baraka.config.Service.OAuth2SuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,52 +24,41 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     @Order(1)
     public SecurityFilterChain oauth2PendingFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/agentauth/pending")
+                .securityMatcher("/api/agentauth/operations/pending")
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().hasAuthority("SCOPE_operations.read")
-                )
+                        .anyRequest().hasAuthority("SCOPE_operations.read"))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .decoder(oauth2JwtDecoder())
-                                .jwtAuthenticationConverter(scopeJwtAuthenticationConverter())
-                        )
-                );
+                                .jwtAuthenticationConverter(scopeJwtAuthenticationConverter())));
 
         return http.build();
     }
 
-@Bean
-@Order(2)
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    @Order(2)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/error", "/auth/**").permitAll()
-            .requestMatchers("/api/client/**").hasAuthority("ROLE_CLIENT")
-            .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
-            .requestMatchers("/api/agent/**").hasAuthority("ROLE_AGENT_BANCAIRE")
-            .anyRequest().authenticated()
-        )
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .oauth2ResourceServer(oauth2 -> oauth2
-            .jwt(jwt -> jwt
-                .decoder(oauth2JwtDecoder())
-                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-            )
-        )
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/error", "/auth/**").permitAll()
+                        .requestMatchers("/api/client/**").hasAuthority("ROLE_CLIENT")
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/agent/**").hasAuthority("ROLE_AGENT_BANCAIRE")
+                        .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-    return http.build();
-}
+        return http.build();
+    }
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -82,7 +70,6 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         authConverter.setJwtGrantedAuthoritiesConverter(converter);
         return authConverter;
     }
-
 
     @Bean
     public JwtAuthenticationConverter scopeJwtAuthenticationConverter() {
