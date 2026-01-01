@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="border-b border-gray-300 bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+        <div class="text-lg font-semibold text-gray-800">
+            Al Baraka Digital
+        </div>
+
+        <form th:action="@{/logout}" method="post">
+            <button
+                type="submit"
+                class="text-sm text-gray-700 border border-gray-300 px-4 py-1.5 hover:bg-gray-100 transition"
+            >
+                Déconnexion
+            </button>
+        </form>
+
+    </div>
+</header>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord Client</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        roboto: ['Roboto', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 font-roboto text-gray-800">
+<div th:replace="components/header"></div>
+
+<div class="min-h-screen p-6 lg:p-10">
+
+    <div class="max-w-7xl mx-auto">
+
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold">Espace Client</h2>
+            <p class="text-gray-600 mt-1">
+                Gérez vos finances en toute sécurité
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+            <div class="bg-white border border-gray-200 p-5">
+                <div class="text-sm text-gray-500 mb-1">Solde disponible</div>
+                <div class="text-xl font-semibold">12 450,00 DH</div>
+            </div>
+
+            <div class="bg-white border border-gray-200 p-5">
+                <div class="text-sm text-gray-500 mb-1">Opérations aujourd’hui</div>
+                <div class="text-xl font-semibold">3</div>
+            </div>
+
+            <div class="bg-white border border-gray-200 p-5">
+                <div class="text-sm text-gray-500 mb-1">Validations automatiques</div>
+                <div class="text-xl font-semibold">100%</div>
+            </div>
+
+        </div>
+
+        <div class="bg-white border border-gray-200 p-6">
+            <h3 class="text-xl font-bold mb-6">Actions rapides</h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                <a href="#"
+                   class="block text-center border border-gray-300 px-6 py-3
+                          hover:bg-gray-50 transition">
+                    Nouveau Dépôt
+                </a>
+
+                <a href="#"
+                   class="block text-center border border-gray-300 px-6 py-3
+                          hover:bg-gray-50 transition">
+                    Virement
+                </a>
+
+                <a href="#"
+                   class="block text-center border border-gray-300 px-6 py-3
+                          hover:bg-gray-50 transition">
+                    Retrait
+                </a>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
