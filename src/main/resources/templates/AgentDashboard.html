@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de bord Agent</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        roboto: ['Roboto', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 font-roboto text-gray-800">
+<div th:replace="components/header"></div>
+
+<div class="min-h-screen p-6 lg:p-10">
+
+    <div class="max-w-7xl mx-auto">
+
+        <div class="mb-10">
+            <h2 class="text-2xl font-bold">Espace Agent Bancaire</h2>
+            <p class="text-gray-600 mt-1">
+                Gestion et validation des opérations bancaires
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+
+            <div class="bg-white border border-gray-200 p-5">
+                <div class="text-sm text-gray-500 mb-1">En attente</div>
+                <div class="text-xl font-semibold">3</div>
+            </div>
+
+            <div class="bg-white border border-gray-200 p-5">
+                <div class="text-sm text-gray-500 mb-1">Validées aujourd’hui</div>
+                <div class="text-xl font-semibold">12</div>
+            </div>
+
+            <div class="bg-white border border-gray-200 p-5">
+                <div class="text-sm text-gray-500 mb-1">Rejetées aujourd’hui</div>
+                <div class="text-xl font-semibold">1</div>
+            </div>
+
+            <div class="bg-white border border-gray-200 p-5">
+                <div class="text-sm text-gray-500 mb-1">Montant en attente</div>
+                <div class="text-xl font-semibold">35 450 DH</div>
+            </div>
+
+        </div>
+
+        <div class="bg-white border border-gray-200 p-6 mb-10">
+            <h3 class="text-xl font-bold mb-2">
+                Opérations en attente de validation
+            </h3>
+            <p class="text-gray-600 mb-6">
+                3 opérations supérieures à 10 000 DH nécessitent votre validation
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a href="/api/agent/operations/pending"
+                   class="block text-center border border-gray-300 px-6 py-3
+                          hover:bg-gray-50 transition">
+                    Voir et valider les opérations
+                </a>
+
+                <a href="/agent/history"
+                   class="block text-center border border-gray-300 px-6 py-3
+                          hover:bg-gray-50 transition">
+                    Consulter l’historique
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <div class="bg-white border border-gray-200 p-6">
+                <h3 class="text-xl font-bold mb-4">Activité récente</h3>
+
+                <ul class="space-y-3 text-sm">
+                    <li class="flex justify-between border-b pb-2">
+                        <span>Opération validée</span>
+                        <span class="font-medium">+5 000 DH</span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span>Opération rejetée</span>
+                        <span class="font-medium">-2 500 DH</span>
+                    </li>
+                    <li class="flex justify-between">
+                        <span>Nouvelle demande reçue</span>
+                        <span class="font-medium">12 000 DH</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white border border-gray-200 p-6">
+                <h3 class="text-xl font-bold mb-4">Performance du jour</h3>
+
+                <div class="space-y-4 text-sm">
+                    <div class="flex justify-between">
+                        <span>Taux de validation</span>
+                        <span class="font-medium">92%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Temps moyen de traitement</span>
+                        <span class="font-medium">3.5 min</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Opérations traitées</span>
+                        <span class="font-medium">13 / 15</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
