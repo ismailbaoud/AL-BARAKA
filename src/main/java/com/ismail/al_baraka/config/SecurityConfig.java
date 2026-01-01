@@ -16,6 +16,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.ismail.al_baraka.config.Service.CustomUserDetailsService;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomUserDetailsService userDetailsService;
 
     @Bean
     @Order(1)
@@ -54,8 +57,30 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/agent/**").hasAuthority("ROLE_AGENT_BANCAIRE")
                         .anyRequest().authenticated())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/auth/login")
+                        .usernameParameter("fullName")
+                        .passwordParameter("password")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+                .rememberMe(rememberMe -> rememberMe
+                        .key("MY_SECRET_KEY_1234")
+                        .tokenValiditySeconds(60 * 60 * 24 * 30)
+                        .rememberMeParameter("remember-me")
+                        .userDetailsService(userDetailsService)
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID", "remember-me")
+                        .permitAll()
+                );
 
         return http.build();
     }
