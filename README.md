@@ -1,42 +1,254 @@
-# AL-BARAKA
+# AL-BARAKA Digital Banking Platform
 
-#### 5. Accéder à l'application
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue.svg)](https://www.postgresql.org/)
+[![Keycloak](https://img.shields.io/badge/Keycloak-24.0-red.svg)](https://www.keycloak.org/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
-Ouvrez votre navigateur et accédez à : http://localhost:8081/login
-
-**Compte de test Agent Bancaire (via Keycloak)** :
-- Username : `test`
-- Password : `test`
+A secure digital banking platform developed with Spring Boot, offering comprehensive account management, banking operations, and document handling with OAuth2/Keycloak authentication.
 
 ---
 
-### Option 2 : Démarrage en mode développement (sans Docker)
+## Table of Contents
 
-#### 1. Installer et démarrer PostgreSQL
+- [About the Project](#about-the-project)
+- [Features](#features)
+- [Architecture and Technologies](#architecture-and-technologies)
+- [Prerequisites](#prerequisites)
+- [Installation and Setup](#installation-and-setup)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Deployment and Hosting](#deployment-and-hosting)
+- [Tests](#tests)
+- [License](#license)
+- [Credits](#credits)
 
-Créez une base de données :
+---
+
+## About the Project
+
+**Al-Baraka Digital** is a modern and secure banking platform that enables comprehensive management of banking operations with robust authentication via OAuth2 and Keycloak. The system implements a multi-role architecture (Client, Banking Agent, Administrator) with operation validation and document management.
+
+### Why This Project?
+
+- **Enhanced Security**: OAuth2/JWT authentication with Keycloak
+- **Operation Validation**: Large transactions require agent approval
+- **Document Management**: Secure upload and storage of supporting documents
+- **Multi-Profile**: Support for development and production profiles
+- **Modern Architecture**: Microservices with Docker Compose
+
+### Technologies Used
+
+- **Backend**: Spring Boot 4.0.0, Java 21
+- **Security**: Spring Security, OAuth2, JWT, Keycloak 24.0
+- **Database**: PostgreSQL 15
+- **ORM**: Hibernate/JPA
+- **Mapping**: MapStruct
+- **Template Engine**: Thymeleaf
+- **Containerization**: Docker, Docker Compose
+- **Build**: Maven
+- **Others**: Lombok, Spring Validation, dotenv
+
+---
+
+## Features
+
+### Authentication and Authorization
+
+- **Dual Authentication Method**:
+  - Classic form-based authentication with JWT
+  - OAuth2 authentication via Keycloak
+- **Role Management**: CLIENT, AGENT_BANCAIRE, ADMIN
+- **Remember Me**: Persistent session for 30 days
+- **Advanced Security**: CSRF protection, JWT validation
+
+### Banking Operations
+
+- **Deposits**: Add funds to account
+- **Withdrawals**: Withdraw funds with balance verification
+- **Transfers**: Transfer between accounts
+- **Automatic Validation**: Operations ≤ 10,000 DH automatically approved
+- **Manual Validation**: Operations > 10,000 DH require agent validation
+
+### Role-Based Dashboards
+
+- **Client**: 
+  - Balance inquiry
+  - Create operations
+  - Upload supporting documents
+  - Transaction history
+  
+- **Banking Agent**:
+  - Pending operations list
+  - Approve/reject operations
+  - Query via OAuth2 with `operations.read` scope
+  
+- **Administrator**:
+  - User management (CRUD)
+  - View all accounts
+  - Global administration
+
+### Document Management
+
+- **Secure Upload**: Support for PDF, JPG, PNG
+- **Size Limit**: 5 MB maximum
+- **Validation**: Type and size verification
+- **Storage**: Files stored locally with unique names
+
+---
+
+## Architecture and Technologies
+
+### Technical Stack
+
+```
+┌─────────────────────────────────────────────────┐
+│               Frontend Layer                     │
+│        Thymeleaf Templates + Tailwind CSS        │
+└──────────────────┬──────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────┐
+│            Security Layer                        │
+│   Spring Security + OAuth2 + JWT + Keycloak     │
+└──────────────────┬──────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────┐
+│          Application Layer                       │
+│    Controllers + Services + DTOs + Mappers       │
+└──────────────────┬──────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────┐
+│         Persistence Layer                        │
+│       JPA/Hibernate + PostgreSQL                 │
+└──────────────────────────────────────────────────┘
+```
+
+### Data Model
+
+- **User**: Users with roles and authentication
+- **Account**: Bank accounts linked to users
+- **Operation**: Transactions (DEPOSIT, WITHDRAWAL, TRANSFER)
+- **Document**: Supporting documents associated with operations
+
+### Notable Technical Points
+
+- **Dual Security Chain**: OAuth2 for external agents, classic JWT for the application
+- **Business Validation**: 10,000 DH threshold for automatic validation
+- **MapStruct**: Automatic Entity ↔ DTO conversion
+- **Transaction Management**: `@Transactional` to ensure consistency
+
+---
+
+## Prerequisites
+
+Before starting, make sure you have installed:
+
+- **Java 21** or higher ([OpenJDK](https://openjdk.org/) or [Eclipse Temurin](https://adoptium.net/))
+- **Maven 3.8+** ([Installation](https://maven.apache.org/install.html))
+- **Docker** and **Docker Compose** ([Installation](https://docs.docker.com/get-docker/))
+- **PostgreSQL 15** (if running without Docker)
+- **Git** to clone the repository
+
+---
+
+## Installation and Setup
+
+### Option 1: Docker Deployment (Recommended)
+
+This method starts the application, PostgreSQL, and Keycloak with a single command.
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/al-baraka.git
+cd al-baraka
+```
+
+#### 2. Create the .env file
+
+Create a `.env` file at the project root with the following variables:
+
+```bash
+# JWT Configuration
+JWT_ISSUER_URI=http://localhost:8180/realms/albaraka
+JWT_JWK_SET_URI=http://localhost:8180/realms/albaraka/protocol/openid-connect/certs
+
+# Profile (dev or prod)
+SPRING_PROFILES_ACTIVE=prod
+
+# Database (Production - Docker)
+PROD_DATABASE=albaraka_test
+PROD_DB_USERNAME=happy
+PROD_DB_PASSWORD=happy
+
+# Database (Development - Local)
+DEV_DATABASE=albaraka_dev
+DEV_DB_USERNAME=postgres
+DEV_DB_PASSWORD=postgres
+```
+
+#### 3. Build the project
+
+```bash
+./mvnw clean package -DskipTests
+```
+
+Or on Windows:
+
+```bash
+mvnw.cmd clean package -DskipTests
+```
+
+#### 4. Start Docker containers
+
+```bash
+docker-compose up -d
+```
+
+Services will be accessible at:
+- **Application**: http://localhost:8081
+- **Keycloak**: http://localhost:8180 (admin/admin)
+- **PostgreSQL**: localhost:5431
+
+#### 5. Access the application
+
+Open your browser and navigate to: http://localhost:8081/login
+
+**Test Banking Agent Account (via Keycloak)**:
+- Username: `test`
+- Password: `test`
+
+---
+
+### Option 2: Development Mode (without Docker)
+
+#### 1. Install and start PostgreSQL
+
+Create a database:
 
 ```sql
 CREATE DATABASE albaraka_dev;
 ```
 
-#### 2. Installer et démarrer Keycloak
+#### 2. Install and start Keycloak
 
 ```bash
-# Télécharger Keycloak 24.0
+# Download Keycloak 24.0
 wget https://github.com/keycloak/keycloak/releases/download/24.0.0/keycloak-24.0.0.tar.gz
 tar -xzf keycloak-24.0.0.tar.gz
 cd keycloak-24.0.0
 
-# Démarrer en mode dev
+# Start in dev mode
 bin/kc.sh start-dev
 ```
 
-Importer le realm : `keycloak-imports/albaraka-realm.json` via l'interface admin.
+Import the realm: `keycloak-imports/albaraka-realm.json` via the admin interface.
 
-#### 3. Configurer le fichier .env
+#### 3. Configure the .env file
 
-Utilisez les variables `DEV_*` dans votre `.env` :
+Use the `DEV_*` variables in your `.env`:
 
 ```bash
 SPRING_PROFILES_ACTIVE=dev
@@ -47,21 +259,21 @@ JWT_ISSUER_URI=http://localhost:8080/realms/albaraka
 JWT_JWK_SET_URI=http://localhost:8080/realms/albaraka/protocol/openid-connect/certs
 ```
 
-#### 4. Lancer l'application
+#### 4. Run the application
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-L'application sera disponible sur : http://localhost:8082
+The application will be available at: http://localhost:8082
 
 ---
 
-## 📖 Utilisation
+## Usage
 
-### Créer un compte client
+### Create a client account
 
-**Endpoint** : `POST /auth/register`
+**Endpoint**: `POST /auth/register`
 
 ```json
 {
@@ -71,13 +283,13 @@ L'application sera disponible sur : http://localhost:8082
 }
 ```
 
-**Réponse** : Retourne un objet `AccountResponse` avec le numéro de compte généré.
+**Response**: Returns an `AccountResponse` object with the generated account number.
 
-### Se connecter
+### Login
 
-**Interface Web** : http://localhost:8081/login
+**Web Interface**: http://localhost:8081/login
 
-Ou via **API** : `POST /auth/login`
+Or via **API**: `POST /auth/login`
 
 ```json
 {
@@ -86,9 +298,9 @@ Ou via **API** : `POST /auth/login`
 }
 ```
 
-### Effectuer une opération (Client)
+### Perform an operation (Client)
 
-**Endpoint** : `POST /api/client/operations`
+**Endpoint**: `POST /api/client/operations`
 
 ```json
 {
@@ -97,39 +309,39 @@ Ou via **API** : `POST /auth/login`
 }
 ```
 
-**Statuts possibles** :
-- `APPROVED` : Opération < 10 000 DH, exécutée immédiatement
-- `PANDING` : Opération ≥ 10 000 DH, en attente de validation
+**Possible statuses**:
+- `APPROVED`: Operation < 10,000 DH, executed immediately
+- `PENDING`: Operation ≥ 10,000 DH, awaiting validation
 
-### Upload de document justificatif
+### Upload supporting document
 
-**Endpoint** : `POST /api/client/operations/{operationId}/document`
+**Endpoint**: `POST /api/client/operations/{operationId}/document`
 
-**Type** : `multipart/form-data`
+**Type**: `multipart/form-data`
 
-**Paramètres** :
-- `file` : Fichier (PDF, JPG, PNG, max 5 MB)
+**Parameters**:
+- `file`: File (PDF, JPG, PNG, max 5 MB)
 
-### Valider une opération (Agent)
+### Validate an operation (Agent)
 
-**Approuver** : `PUT /api/agent/operations/{id}/approve`
+**Approve**: `PUT /api/agent/operations/{id}/approve`
 
-**Rejeter** : `PUT /api/agent/operations/{id}/reject`
+**Reject**: `PUT /api/agent/operations/{id}/reject`
 
-### Exemples avec curl
+### Examples with curl
 
 ```bash
-# Créer un compte
+# Create an account
 curl -X POST http://localhost:8081/auth/register \
   -H "Content-Type: application/json" \
   -d '{"fullName":"Test User","email":"test@example.com","password":"test123"}'
 
-# Connexion
+# Login
 curl -X POST http://localhost:8081/auth/login \
   -H "Content-Type: application/json" \
   -d '{"fullName":"Test User","password":"test123"}'
 
-# Créer un dépôt
+# Create a deposit
 curl -X POST http://localhost:8081/api/client/operations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -138,211 +350,178 @@ curl -X POST http://localhost:8081/api/client/operations \
 
 ---
 
-## 📁 Structure du projet
+## Project Structure
 
 ```
 al-baraka/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/ismail/al_baraka/
-│   │   │   ├── config/              # Configuration Spring Security, JWT, OAuth2
-│   │   │   ├── controller/          # Contrôleurs REST et MVC
+│   │   │   ├── config/              # Spring Security, JWT, OAuth2 configuration
+│   │   │   ├── controller/          # REST and MVC controllers
 │   │   │   ├── dto/                 # Data Transfer Objects
-│   │   │   ├── Exception/           # Gestion des exceptions
-│   │   │   ├── helper/              # Utilitaires (génération numéro compte, etc.)
+│   │   │   ├── Exception/           # Exception handling
+│   │   │   ├── helper/              # Utilities (account number generation, etc.)
 │   │   │   ├── mapper/              # MapStruct mappers
-│   │   │   ├── model/               # Entités JPA
-│   │   │   │   └── enums/           # Énumérations (Role, Status, OperationType)
-│   │   │   ├── repository/          # Repositories JPA
-│   │   │   └── service/             # Services métier
+│   │   │   ├── model/               # JPA entities
+│   │   │   │   └── enums/           # Enumerations (Role, Status, OperationType)
+│   │   │   ├── repository/          # JPA repositories
+│   │   │   └── service/             # Business services
 │   │   └── resources/
-│   │       ├── application*.properties  # Configuration par profil
-│   │       ├── templates/           # Templates Thymeleaf
-│   │       └── static/              # Assets statiques
-│   └── test/                        # Tests unitaires et d'intégration
-├── keycloak-imports/                # Configuration Keycloak
-├── upload/                          # Dossier de stockage des documents
-├── docker-compose.yml               # Orchestration Docker
-├── Dockerfile                       # Image Docker de l'application
-├── pom.xml                          # Dépendances Maven
-└── README.md                        # Ce fichier
+│   │       ├── application*.properties  # Profile-based configuration
+│   │       ├── templates/           # Thymeleaf templates
+│   │       └── static/              # Static assets
+│   └── test/                        # Unit and integration tests
+├── keycloak-imports/                # Keycloak configuration
+├── upload/                          # Document storage folder
+├── docker-compose.yml               # Docker orchestration
+├── Dockerfile                       # Application Docker image
+├── pom.xml                          # Maven dependencies
+└── README.md                        # This file
 ```
 
 ---
 
-## 🚀 Déploiement et Hébergement
+## Deployment and Hosting
 
-### Infrastructure Cloud - DigitalOcean
+### Cloud Infrastructure - DigitalOcean
 
-Ce projet est **hébergé sur DigitalOcean**, une plateforme cloud reconnue pour sa fiabilité et sa simplicité d'utilisation. Le déploiement en environnement de production a été réalisé avec succès sur un serveur Droplet Linux.
+This project is **hosted on DigitalOcean**, a cloud platform recognized for its reliability and ease of use. Production deployment was successfully completed on a Linux Droplet server.
 
-### 🛠️ Processus de Déploiement
+### Deployment Process
 
-Le déploiement de cette plateforme bancaire a impliqué plusieurs étapes techniques complexes, offrant une expérience d'apprentissage approfondie dans l'administration système et le DevOps :
+Deploying this banking platform involved several complex technical steps, providing an in-depth learning experience in system administration and DevOps:
 
-#### 1. **Configuration du Serveur**
-- **Provisionnement** : Création et configuration d'un Droplet Ubuntu 22.04 LTS
-- **Sécurisation** : Configuration des utilisateurs non-root avec privilèges sudo
-- **Mise à jour système** : Application des dernières mises à jour de sécurité
-- **Installation des dépendances** : Java 21, PostgreSQL 15, Docker, Docker Compose
+#### 1. **Server Configuration**
+- **Provisioning**: Creation and configuration of an Ubuntu 22.04 LTS Droplet
+- **Hardening**: Configuration of non-root users with sudo privileges
+- **System Updates**: Application of the latest security updates
+- **Dependency Installation**: Java 21, PostgreSQL 15, Docker, Docker Compose
 
-#### 2. **Accès et Gestion via SSH**
-- **Connexion sécurisée** : Établissement de connexions SSH avec authentification par clé
-- **Gestion des clés SSH** : Génération et configuration de paires de clés publique/privée
-- **Configuration SSH** : Personnalisation du fichier `~/.ssh/config` pour un accès simplifié
-- **Transfert de fichiers** : Utilisation de SCP et SFTP pour le déploiement des artifacts
+#### 2. **SSH Access and Management**
+- **Secure Connection**: Establishing SSH connections with key-based authentication
+- **SSH Key Management**: Generation and configuration of public/private key pairs
+- **SSH Configuration**: Customization of `~/.ssh/config` file for simplified access
 
-#### 3. **Configuration Nginx comme Reverse Proxy**
-- **Installation et configuration** : Nginx pour gérer le trafic HTTP/HTTPS
-- **Reverse proxy** : Redirection du trafic vers l'application Spring Boot (port 8081)
-- **Certificats SSL/TLS** : Configuration de HTTPS avec Let's Encrypt
-- **Optimisation** : Configuration de la compression gzip et du caching
-- **Logs** : Mise en place de la rotation des logs et monitoring
+#### 4. **Firewall Management (UFW)**
+- **Rule Configuration**: Selective opening of necessary ports
+  - Port 22: SSH
+  - Port 80: HTTP
+  - Port 443: HTTPS
+- **Enhanced Security**: Blocking all other ports by default
 
-**Exemple de configuration Nginx** :
-```nginx
-server {
-    listen 80;
-    server_name votre-domaine.com;
+#### 5. **Application Deployment**
+- **Production Build**: Compiling the WAR with `mvnw clean package`
+- **Server Transfer**: Upload via SCP
+- **Environment Variable Configuration**: `.env` file for production
+- **Docker Orchestration**: Deployment with Docker Compose
+- **Service Management**: Systemd configuration for automatic startup
 
-    location / {
-        proxy_pass http://localhost:8081;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
+#### 6. **Database and Keycloak**
+- **PostgreSQL**: Installation and configuration with dedicated users
+- **Keycloak**: Authentication server deployment in Docker container
+- **Realm Import**: Automatic configuration via `keycloak-imports/albaraka-realm.json`
+- **Automatic Backup**: Daily backup scripts implementation
 
-#### 4. **Gestion du Firewall (UFW)**
-- **Configuration des règles** : Ouverture sélective des ports nécessaires
-  - Port 22 : SSH
-  - Port 80 : HTTP
-  - Port 443 : HTTPS
-- **Sécurité renforcée** : Blocage de tous les autres ports par défaut
-- **Rate limiting** : Protection contre les attaques DDoS et brute force
+### Skills Acquired
 
-**Commandes UFW utilisées** :
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
-sudo ufw enable
-sudo ufw status
-```
+This deployment process enabled the development of essential skills in:
 
-#### 5. **Déploiement de l'Application**
-- **Build de production** : Compilation du WAR avec `mvnw clean package`
-- **Transfert sur le serveur** : Upload via SCP
-- **Configuration des variables d'environnement** : Fichier `.env` pour la production
-- **Orchestration Docker** : Déploiement avec Docker Compose
-- **Gestion des services** : Configuration de systemd pour le démarrage automatique
+| Domain | Skills |
+|--------|--------|
+| **Linux Administration** | Ubuntu server management, bash commands, process and service management |
+| **Security** | SSH configuration, UFW firewall management, SSL/TLS certificates, access hardening |
+| **DevOps** | Continuous deployment, configuration management, shell script automation |
+| **Networking** | Nginx configuration, reverse proxy, port management, DNS |
+| **Containerization** | Docker, Docker Compose, image and volume management |
+| **Monitoring** | Log analysis, performance monitoring, incident resolution |
 
-#### 6. **Base de Données et Keycloak**
-- **PostgreSQL** : Installation et configuration avec utilisateurs dédiés
-- **Keycloak** : Déploiement du serveur d'authentification en conteneur Docker
-- **Import du realm** : Configuration automatique via `keycloak-imports/albaraka-realm.json`
-- **Backup automatique** : Mise en place de scripts de sauvegarde journalière
+### Best Practices Implemented
 
-### 📚 Compétences Acquises
+- **Environment Separation**: Distinct profiles for dev/prod
+- **Secret Management**: Secure environment variables and `.env` files
+- **Mandatory HTTPS**: Encryption of all communications
+- **Configured Firewall**: Minimal attack surface
+- **Centralized Logs**: Facilitates debugging and auditing
+- **Regular Updates**: System and dependencies up to date
 
-Ce processus de déploiement a permis de développer des compétences essentielles en :
+### Lessons Learned
 
-| Domaine | Compétences |
-|---------|-------------|
-| **Administration Linux** | Gestion d'un serveur Ubuntu, commandes bash, gestion des processus et services |
-| **Sécurité** | Configuration SSH, gestion du firewall UFW, certificats SSL/TLS, sécurisation des accès |
-| **DevOps** | Déploiement continu, gestion de configurations, automatisation avec scripts shell |
-| **Réseau** | Configuration Nginx, reverse proxy, gestion des ports, DNS |
-| **Conteneurisation** | Docker, Docker Compose, gestion d'images et de volumes |
-| **Monitoring** | Analyse des logs, surveillance des performances, résolution d'incidents |
+Deploying this application on DigitalOcean represented a **real technical challenge** and an **exceptional learning opportunity**. Beyond application development, this project allowed me to:
 
-### 🔒 Bonnes Pratiques Implémentées
+- Understand **production challenges**: high availability, security, performance
+- Master **system administration tools**: SSH, Nginx, UFW, systemd
+- Grasp **networking issues**: DNS, ports, protocols
+- Develop a **DevOps approach**: automation, monitoring, continuous deployment
+- Strengthen **application security**: HTTPS, firewall, robust authentication
 
-- ✅ **Séparation des environnements** : Profils distincts pour dev/prod
-- ✅ **Gestion des secrets** : Variables d'environnement et fichiers `.env` sécurisés
-- ✅ **HTTPS obligatoire** : Chiffrement de toutes les communications
-- ✅ **Firewall configuré** : Surface d'attaque minimale
-- ✅ **Logs centralisés** : Facilite le débogage et l'audit
-- ✅ **Mises à jour régulières** : Système et dépendances à jour
-
-### 🎓 Retour d'Expérience
-
-Le déploiement de cette application sur DigitalOcean a représenté un **véritable défi technique** et une **opportunité d'apprentissage exceptionnelle**. Au-delà du développement applicatif, ce projet a permis de :
-
-- Comprendre les **enjeux de production** : haute disponibilité, sécurité, performances
-- Maîtriser les **outils d'administration système** : SSH, Nginx, UFW, systemd
-- Appréhender les **problématiques réseau** : DNS, ports, protocoles
-- Développer une **approche DevOps** : automatisation, monitoring, déploiement continu
-- Renforcer la **sécurité applicative** : HTTPS, firewall, authentification robuste
-
-Cette expérience pratique a consolidé la compréhension du **cycle de vie complet** d'une application moderne, de la conception au déploiement en production.
+This hands-on experience consolidated the understanding of the **complete lifecycle** of a modern application, from design to production deployment.
 
 ---
 
 ## Tests
 
-### Exécuter les tests
+### Running Tests
 
 ```bash
-# Tous les tests
+# All tests
 ./mvnw test
 
-# Tests d'une classe spécifique
+# Specific test class
 ./mvnw test -Dtest=UserServiceTest
 
-# Avec couverture de code
+# With code coverage
 ./mvnw clean test jacoco:report
 ```
 
-### Types de tests
+### Test Types
 
-Le projet inclut :
-- **Tests unitaires** : Services, mappers, utilitaires
-- **Tests d'intégration** : Repositories, contrôleurs
-- **Tests de sécurité** : Authentification, autorisation
-
----
-
-## Licence
-
-Ce projet est distribué sous la licence **GNU General Public License v3.0 (GPL-3.0)**.
-
-Vous êtes libre de :
-- Utiliser ce logiciel à des fins commerciales
-- Modifier le code source
-- Distribuer des copies
-- Utiliser ce logiciel en privé
-
-**Conditions** :
-- Divulguer le code source des modifications
-- Inclure la licence et les droits d'auteur
-- Indiquer les changements effectués
-- Utiliser la même licence (GPL-3.0) pour les dérivés
-
-Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+The project includes:
+- **Unit Tests**: Services, mappers, utilities
+- **Integration Tests**: Repositories, controllers
+- **Security Tests**: Authentication, authorization
 
 ---
 
-## 👥 Crédits
+## License
 
-### Développeur principal
+This project is distributed under the **GNU General Public License v3.0 (GPL-3.0)**.
 
-- **Ismail** - Développement initial et architecture
+You are free to:
+- Use this software for commercial purposes
+- Modify the source code
+- Distribute copies
+- Use this software privately
 
-### Technologies et frameworks
+**Conditions**:
+- Disclose the source code of modifications
+- Include the license and copyright
+- State changes made
+- Use the same license (GPL-3.0) for derivatives
 
-Ce projet s'appuie sur des technologies open source de qualité :
+See the [LICENSE](LICENSE) file for more details.
 
-- [Spring Framework](https://spring.io/) - Framework Java entreprise
-- [Keycloak](https://www.keycloak.org/) - Solution IAM open source
-- [PostgreSQL](https://www.postgresql.org/) - Base de données relationnelle
-- [MapStruct](https://mapstruct.org/) - Générateur de mappers Java
-- [Lombok](https://projectlombok.org/) - Réduction du boilerplate Java
-- [Thymeleaf](https://www.thymeleaf.org/) - Moteur de templates
-- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS utilitaire
+---
 
-### Ressources et inspirations
+## Credits
+
+### Lead Developer
+
+- **Ismail** - Initial development and architecture
+
+### Technologies and Frameworks
+
+This project relies on quality open-source technologies:
+
+- [Spring Framework](https://spring.io/) - Enterprise Java framework
+- [Keycloak](https://www.keycloak.org/) - Open-source IAM solution
+- [PostgreSQL](https://www.postgresql.org/) - Relational database
+- [MapStruct](https://mapstruct.org/) - Java mapper generator
+- [Lombok](https://projectlombok.org/) - Java boilerplate reduction
+- [Thymeleaf](https://www.thymeleaf.org/) - Template engine
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+
+### Resources and Inspirations
 
 - [Spring Security OAuth2 Documentation](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html)
 - [Keycloak Documentation](https://www.keycloak.org/documentation)
@@ -350,19 +529,20 @@ Ce projet s'appuie sur des technologies open source de qualité :
 
 ---
 
-## Support et contact
+## Support and Contact
 
-Pour toute question ou suggestion :
-- **Bugs** : Ouvrir une issue sur GitHub
-- **Améliorations** : Proposer une pull request
-- **Contact** : [Votre email]
+For any questions or suggestions:
+- **Bugs**: Open an issue on GitHub
+- **Improvements**: Submit a pull request
+- **Contact**: ismailbaoud04@gmail.com
 
 ---
 
 <div align="center">
 
-**Si ce projet vous a été utile, n'hésitez pas à lui donner une étoile !**
+**If this project was helpful to you, feel free to give it a star!**
 
-Développé avec passion par Ismail
+Developed with passion by Ismail
 
 </div>
+
