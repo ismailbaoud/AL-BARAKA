@@ -6,9 +6,9 @@ services:
     networks:
       - net-albaraka_app
     environment:
-      POSTGRES_DB: albaraka_test
-      POSTGRES_USER: happy
-      POSTGRES_PASSWORD: happy
+      POSTGRES_DB: ${PROD_DATABASE}
+      POSTGRES_USER: ${PROD_DB_USERNAME}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
     ports:
       - "5431:5432"
     volumes:
@@ -21,8 +21,8 @@ services:
     networks:
       - net-albaraka_app
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
     ports:
       - "8180:8080"
     volumes:
@@ -38,15 +38,15 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/albaraka_test
-      SPRING_DATASOURCE_USERNAME: happy
-      SPRING_DATASOURCE_PASSWORD: happy
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${PROD_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${PROD_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${PROD_DB_PASSWORD}
 
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/albaraka
-      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/albaraka
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${JWT_ISSUER_URI}
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI: ${CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI}
 
     depends_on:
       - db
