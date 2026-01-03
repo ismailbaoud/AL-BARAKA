@@ -17,12 +17,10 @@
         Entrez vos informations pour continuer
     </p>
 
-    <!-- erreur -->
     <div th:if="${param.error}" class="mb-4 border border-red-300 bg-red-50 p-3 text-sm text-red-700">
         Identifiants incorrects.
     </div>
 
-    <!-- logout -->
     <div th:if="${param.logout}" class="mb-4 border border-green-300 bg-green-50 p-3 text-sm text-green-700">
         Déconnexion réussie.
     </div>
@@ -66,6 +64,10 @@
         </button>
     </form>
 
+    <div class="mt-6 text-center text-xs text-gray-500">
+        <a th:href="@{/register}">You don't have account ?</a>
+    </div>    
+    
     <div class="mt-6 text-center text-xs text-gray-500">
         © Al Baraka digital
     </div>
