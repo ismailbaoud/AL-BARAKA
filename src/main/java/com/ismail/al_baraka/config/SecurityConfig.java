@@ -52,7 +52,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/error", "/auth/**").permitAll()
+                        .requestMatchers("/error", "/auth/**","/register").permitAll()
                         .requestMatchers("/api/client/**").hasAuthority("ROLE_CLIENT")
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/agent/**").hasAuthority("ROLE_AGENT_BANCAIRE")
