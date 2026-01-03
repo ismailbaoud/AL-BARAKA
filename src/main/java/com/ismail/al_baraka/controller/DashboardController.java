@@ -4,11 +4,24 @@ package com.ismail.al_baraka.controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import com.ismail.al_baraka.Exception.customExceptions.AccountUserNotFoundException;
+import com.ismail.al_baraka.dto.user.request.UserRequest;
+import com.ismail.al_baraka.service.UserService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 public class DashboardController {
 
+    private final UserService userService;
     @GetMapping("/")
     public String root(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -25,6 +38,33 @@ public class DashboardController {
     @GetMapping("/login")
     public String login() {
         return "login";
+    }
+
+    @GetMapping("/register")
+    public String register(Model model) {
+        model.addAttribute("userRequest", new UserRequest());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public String handleRegister(
+            @ModelAttribute("userRequest") UserRequest request,
+            BindingResult result,
+            Model model
+    ) {
+        if (result.hasErrors()) {
+            return "register";
+        }
+
+        try {
+            userService.createUser(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Username already exists");
+            return "register";
+        }
+
+        return "redirect:/login?registered";
     }
 
     @GetMapping("/client/dashboard")
