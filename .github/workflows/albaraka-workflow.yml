@@ -7,18 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: deploy using ssh
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
-          command_timeout: 30m
-          script: | 
-            cd albaraka/
-            docker compose pull
-            docker compose up -d
       - name: Checkout code
         uses: actions/checkout@v3
       - name: set up jdk 21
@@ -39,3 +27,20 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/albaraka:latest
+  deploy:
+
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: deploy using ssh
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          command_timeout: 30m
+          script: | 
+            cd albaraka/
+            docker compose pull
+            docker compose up -d
