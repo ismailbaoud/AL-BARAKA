@@ -8,14 +8,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import com.ismail.al_baraka.Exception.customExceptions.AccountUserNotFoundException;
 import com.ismail.al_baraka.dto.user.request.UserRequest;
 import com.ismail.al_baraka.service.UserService;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 @Controller
 @RequiredArgsConstructor
