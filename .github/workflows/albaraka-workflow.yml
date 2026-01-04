@@ -27,11 +27,6 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/albaraka:latest
-  deploy:
-
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: deploy using ssh
         uses: appleboy/ssh-action@v0.1.6
         with:
