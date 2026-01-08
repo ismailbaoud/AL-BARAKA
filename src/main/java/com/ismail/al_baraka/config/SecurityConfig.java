@@ -60,14 +60,14 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/auth/login")
-                        .usernameParameter("fullName")
-                        .passwordParameter("password")
-                        .defaultSuccessUrl("/", true)
-                        .permitAll()
-                )
+                // .formLogin(form -> form
+                //         .loginPage("/login")
+                //         .loginProcessingUrl("/auth/login")
+                //         .usernameParameter("fullName")
+                //         .passwordParameter("password")
+                //         .defaultSuccessUrl("/", true)
+                //         .permitAll()
+                // )
                 .rememberMe(rememberMe -> rememberMe
                         .key("MY_SECRET_KEY_1234")
                         .tokenValiditySeconds(60 * 60 * 24 * 30)
