@@ -1,0 +1,25 @@
+<form (submit)="onSubmit()">
+      <div>
+        <label>
+          Email
+          <input type="email" [field]="loginForm.email" />
+        </label>
+        @if (loginForm.email().touched() && loginForm.email().invalid()) {
+          <span class="error">
+            {{ loginForm.email().errors()[0].message }}
+          </span>
+        }
+      </div>
+      <div>
+        <label>
+          Password
+          <input type="password" [field]="loginForm.password" />
+        </label>
+        @if (loginForm.password().touched() && loginForm.password().invalid()) {
+          <span class="error">
+            {{ loginForm.password().errors()[0].message }}
+          </span>
+        }
+      </div>
+      <button type="submit" [disabled]="loginForm().invalid()">Sign In</button>
+    </form>
