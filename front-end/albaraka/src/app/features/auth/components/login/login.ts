@@ -1,37 +1,44 @@
-import { Component, signal } from '@angular/core';
-import {form, Field} from '@angular/forms/signals';
+import { Component } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
-interface LoginData {
-  email: string;
-  password: string;
-}
+import { NgIf } from "../../../../../../node_modules/@angular/common/types/_common_module-chunk";
 
 @Component({
   selector: 'app-login',
-  imports: [Field],
+  standalone: true,
+  imports: [ReactiveFormsModule, NgIf],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css']
 })
 export class Login {
+  loginForm: FormGroup;
 
-  constructor(private authService: AuthService) { }
-
-  loginModel = signal<LoginData>({
-    email: '',
-    password: '',
-  });
-
-  loginForm = form(this.loginModel);
-    onSubmit() {
-    const email = this.loginForm.email().value();
-    const password = this.loginForm.password().value();
-
-    this.authService.login(email, password)
-      .subscribe({
-        next: res => console.log('JWT:', res.token),
-        error: err => console.error('Login failed', err)
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
-  
+
+  onSubmit() {
+    if (this.loginForm.valid) {
+      const { email, password } = this.loginForm.value;
+
+      this.authService.login(email, password).subscribe({
+        next: () => {
+          console.log('Login successful');
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          alert('Invalid email or password');
+          console.error('Login error', err);
+        }
+      });
+    }
+  }
 }
