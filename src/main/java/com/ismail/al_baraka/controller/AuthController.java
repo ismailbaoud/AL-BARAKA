@@ -1,7 +1,6 @@
 package com.ismail.al_baraka.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +14,6 @@ import com.ismail.al_baraka.service.impliment.AuthServiceImpl;
 import com.ismail.al_baraka.service.impliment.UserServiceImpl;
 
 import lombok.RequiredArgsConstructor;
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
